@@ -78,13 +78,13 @@
             <div class="pt-4">
                 <p class="text-xs text-slate-500 mb-3 font-medium">Chọn một tình huống mẫu hoặc tự nhập vấn đề của riêng bạn:</p>
                 <div class="flex flex-wrap justify-center gap-2 max-w-xl mx-auto">
-                    <button onclick="useSuggestion('Có nên nghỉ việc văn phòng ổn định để ra ngoài khởi nghiệp tự do không?')" class="text-xs bg-slate-800/40 hover:bg-slate-800 hover:border-slate-600 text-slate-300 border border-slate-800/80 px-3 py-2 rounded-lg transition text-left">
+                    <button onclick="useSuggestion('Có nên nghỉ việc văn phòng ổn định để ra ngoài khởi nghiệp tự do không?')" class="text-xs bg-slate-800/40 hover:bg-slate-800 hover:border-slate-600 text-slate-300 border border-slate-800/80 px-3.5 py-2 rounded-lg transition text-left">
                         🚀 Nghỉ việc khởi nghiệp
                     </button>
-                    <button onclick="useSuggestion('Tôi có nên rút toàn bộ tiết kiệm để đầu tư mua nhà trả góp vào lúc này?')" class="text-xs bg-slate-800/40 hover:bg-slate-800 hover:border-slate-600 text-slate-300 border border-slate-800/80 px-3 py-2 rounded-lg transition text-left">
+                    <button onclick="useSuggestion('Tôi có nên rút toàn bộ tiết kiệm để đầu tư mua nhà trả góp vào lúc này?')" class="text-xs bg-slate-800/40 hover:bg-slate-800 hover:border-slate-600 text-slate-300 border border-slate-800/80 px-3.5 py-2 rounded-lg transition text-left">
                         🏡 Mua nhà trả góp lúc này?
                     </button>
-                    <button onclick="useSuggestion('Tôi có nên dấn thân chuyển sang học và làm một ngành hoàn toàn mới ở tuổi 30?')" class="text-xs bg-slate-800/40 hover:bg-slate-800 hover:border-slate-600 text-slate-300 border border-slate-800/80 px-3 py-2 rounded-lg transition text-left">
+                    <button onclick="useSuggestion('Tôi có nên dấn thân chuyển sang học và làm một ngành hoàn toàn mới ở tuổi 30?')" class="text-xs bg-slate-800/40 hover:bg-slate-800 hover:border-slate-600 text-slate-300 border border-slate-800/80 px-3.5 py-2 rounded-lg transition text-left">
                         🎓 Đổi ngành ở tuổi 30?
                     </button>
                 </div>
@@ -339,7 +339,114 @@
 
     <!-- Script Area containing Application Core Logic -->
     <script>
-        // API Configuration (Corrected endpoint path to use the stable Gemini 2.5 Flash model)
+        // --- 1. UTILITY & HELPER FUNCTIONS (Declared at the absolute top of script for compile stability) ---
+        
+        // Helper to populate suggest options
+        function useSuggestion(text) {
+            const inputField = document.getElementById('dilemma-input');
+            if (inputField) {
+                inputField.value = text;
+                inputField.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Modal toggles
+        function openModal(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.classList.remove('hidden');
+            }
+        }
+
+        function closeModal(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.classList.add('hidden');
+            }
+        }
+
+        // Toggle Privacy Language
+        function togglePrivacyLang(lang) {
+            const btnVi = document.getElementById('btn-lang-vi');
+            const btnEn = document.getElementById('btn-lang-en');
+            const contentVi = document.getElementById('privacy-content-vi');
+            const contentEn = document.getElementById('privacy-content-en');
+            const title = document.getElementById('privacy-title');
+            const closeBtn = document.getElementById('privacy-close-btn');
+
+            const activeBtnClass = "px-4 py-1.5 text-xs font-bold rounded-md bg-indigo-600 text-white shadow-sm transition";
+            const inactiveBtnClass = "px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white transition";
+            const iconSvg = '<svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>';
+
+            if (lang === 'vi') {
+                if (btnVi) btnVi.className = activeBtnClass;
+                if (btnEn) btnEn.className = inactiveBtnClass;
+                if (contentVi) contentVi.classList.remove('hidden');
+                if (contentEn) contentEn.classList.add('hidden');
+                if (title) title.innerHTML = iconSvg + ' Chính Sách Bảo Mật & Điều Khoản';
+                if (closeBtn) closeBtn.textContent = 'Tôi Đã Hiểu';
+            } else {
+                if (btnEn) btnEn.className = activeBtnClass;
+                if (btnVi) btnVi.className = inactiveBtnClass;
+                if (contentEn) contentEn.classList.remove('hidden');
+                if (contentVi) contentVi.classList.add('hidden');
+                if (title) title.innerHTML = iconSvg + ' Privacy Policy & Terms';
+                if (closeBtn) closeBtn.textContent = 'I Understand';
+            }
+        }
+
+        // Custom Toast/Notification instead of window alerts
+        function showVisualMessage(message, type = "info") {
+            const toastId = "app-toast";
+            let toast = document.getElementById(toastId);
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.id = toastId;
+                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300 transform translate-y-10 opacity-0 max-w-sm";
+                document.body.appendChild(toast);
+            }
+
+            // Style configuration based on alert type
+            if (type === "warning") {
+                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border border-amber-500/30 bg-amber-950/80 text-amber-200 shadow-2xl transition-all duration-300 max-w-sm";
+            } else if (type === "error") {
+                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border border-rose-500/30 bg-rose-950/80 text-rose-200 shadow-2xl transition-all duration-300 max-w-sm";
+            } else {
+                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border border-emerald-500/30 bg-emerald-950/80 text-emerald-200 shadow-2xl transition-all duration-300 max-w-sm";
+            }
+
+            toast.textContent = message;
+            toast.style.transform = "translateY(0px)";
+            toast.style.opacity = "1";
+
+            setTimeout(() => {
+                toast.style.transform = "translateY(10px)";
+                toast.style.opacity = "0";
+            }, 4500);
+        }
+
+        // Print function to physically save or print out the action report
+        function printSummary() {
+            const contentElement = document.getElementById('summary-content');
+            if (!contentElement) return;
+            const printContent = contentElement.textContent;
+
+            // Simplified print template
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Biên bản đàm phán nội tâm - Self-Negotiation Bot</title>');
+            printWindow.document.write('<style>body{font-family: sans-serif; padding: 40px; color: #1e293b; line-height: 1.6;} h1{color: #3b82f6;} pre{white-space: pre-wrap; font-family: inherit;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h1>BIÊN BẢN ĐÀM PHÁN TƯ DUY NỘI TÂM</h1>');
+            printWindow.document.write(`<p><strong>Vấn đề đưa ra đàm phán:</strong> "${initialDilemma}"</p>`);
+            printWindow.document.write('<hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">');
+            printWindow.document.write('<pre>' + printContent + '</pre>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // --- 2. CORE BUSINESS & API LOGIC ---
+
         const apiKey = "AIzaSyDfTtSLw1LqyetKE_FWHhnjNfP7ir1HmmQ";
         const fallbackModel = "gemini-2.5-flash";
         
@@ -383,51 +490,6 @@
                     await new Promise(resolve => setTimeout(resolve, delay));
                     delay *= 2;
                 }
-            }
-        }
-
-        // Helper to populate suggest options
-        function useSuggestion(text) {
-            document.getElementById('dilemma-input').value = text;
-            // Scroll to input box smoothly
-            document.getElementById('dilemma-input').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Modal triggers
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-
-        // Toggle Privacy Language
-        function togglePrivacyLang(lang) {
-            const btnVi = document.getElementById('btn-lang-vi');
-            const btnEn = document.getElementById('btn-lang-en');
-            const contentVi = document.getElementById('privacy-content-vi');
-            const contentEn = document.getElementById('privacy-content-en');
-            const title = document.getElementById('privacy-title');
-            const closeBtn = document.getElementById('privacy-close-btn');
-
-            const activeBtnClass = "px-4 py-1.5 text-xs font-bold rounded-md bg-indigo-600 text-white shadow-sm transition";
-            const inactiveBtnClass = "px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white transition";
-            const iconSvg = '<svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>';
-
-            if (lang === 'vi') {
-                btnVi.className = activeBtnClass;
-                btnEn.className = inactiveBtnClass;
-                contentVi.classList.remove('hidden');
-                contentEn.classList.add('hidden');
-                title.innerHTML = iconSvg + ' Chính Sách Bảo Mật & Điều Khoản';
-                closeBtn.textContent = 'Tôi Đã Hiểu';
-            } else {
-                btnEn.className = activeBtnClass;
-                btnVi.className = inactiveBtnClass;
-                contentEn.classList.remove('hidden');
-                contentVi.classList.add('hidden');
-                title.innerHTML = iconSvg + ' Privacy Policy & Terms';
-                closeBtn.textContent = 'I Understand';
             }
         }
 
@@ -534,11 +596,6 @@
             const btnRebut = document.getElementById('btn-rebut');
             btnRebut.disabled = true;
             btnRebut.textContent = "Hội đồng đang phản biện...";
-
-            const userEntry = {
-                role: "user",
-                message: `[Gửi tới ${targetPersona}]: ${rebuttalVal}`
-            };
             
             // Build Context for Next Multi-turn payload
             const contextHistory = chatLogs.map(log => `${log.role.toUpperCase()}: ${log.message}`).join("\n\n");
@@ -677,7 +734,6 @@
                 btnSum.disabled = false;
             }
         }
-
-        // Custom Toast/Notification instead of window alerts
-        function showVisualMessage(message, type = "info") {
-            const toastId = "
+    </script>
+</body>
+</html>
