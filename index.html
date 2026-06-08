@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thương thảo với chính mình - Self-Negotiation Bot</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        /* Custom scrollbar for better visual depth */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+
+    <!-- Top Navigation / Header -->
+    <header class="border-b border-slate-800/80 bg-[#0f172a]/60 backdrop-blur sticky top-0 z-40 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 transform group-hover:scale-105 transition-transform">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                        Self-Negotiation Bot
+                    </h1>
+                    <p class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">Thương Thảo Với Chính Mình</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <button onclick="openModal('privacy-modal')" class="text-xs text-slate-400 hover:text-slate-200 bg-slate-800/50 hover:bg-slate-800 px-3.5 py-2 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <span>Quyền riêng tư (Privacy)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Welcome & Introduction Screen (Hidden after first submission) -->
+        <div id="welcome-screen" class="max-w-3xl mx-auto text-center space-y-6 py-8">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                AI Phân Tích Đa Chiều Quyết Định Khó Khăn
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                Giải Quyết Các Xung Đột Nội Tâm <br>
+                <span class="bg-gradient-to-r from-sky-400 via-indigo-400 to-pink-400 bg-clip-text text-transparent">Theo Cách Khoa Học Nhất</span>
+            </h2>
+            <p class="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+                Khi đối mặt với các lựa chọn khó khăn, tâm lý chúng ta thường bị chia rẽ. Hãy mang mâu thuẫn đó lên bàn đàm phán gồm 3 góc nhìn cực đoan đại diện cho chính những khao khát, thực tế và nỗi sợ bên trong bạn.
+            </p>
+
+            <!-- Suggestion Badges -->
+            <div class="pt-4">
+                <p class="text-xs text-slate-500 mb-3 font-medium">Chọn một tình huống mẫu hoặc tự nhập vấn đề của riêng bạn:</p>
+                <div class="flex flex-wrap justify-center gap-2 max-w-xl mx-auto">
+                    <button onclick="useSuggestion('Có nên nghỉ việc văn phòng ổn định để ra ngoài khởi nghiệp tự do không?')" class="text-xs bg-slate-800/40 hover:bg-slate-800 hover:border-slate-600 text-slate-300 border border-slate-800/80 px-3 py-2 rounded-lg transition text-left">
+                        🚀 Nghỉ việc khởi nghiệp
+                    </button>
+                    <button onclick="useSuggestion('Tôi có nên rút toàn bộ tiết kiệm để đầu tư mua nhà trả góp vào lúc này?')" class="text-xs bg-slate-800/40 hover:bg-slate-800 hover:border-slate-600 text-slate-300 border border-slate-800/80 px-3 py-2 rounded-lg transition text-left">
+                        🏡 Mua nhà trả góp lúc này?
+                    </button>
+                    <button onclick="useSuggestion('Tôi có nên dấn thân chuyển sang học và làm một ngành hoàn toàn mới ở tuổi 30?')" class="text-xs bg-slate-800/40 hover:bg-slate-800 hover:border-slate-600 text-slate-300 border border-slate-800/80 px-3 py-2 rounded-lg transition text-left">
+                        🎓 Đổi ngành ở tuổi 30?
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Box Area -->
+        <div class="max-w-3xl mx-auto mt-8 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur">
+            <div class="flex items-start space-x-4">
+                <div class="flex-grow">
+                    <label for="dilemma-input" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Quyết định băn khoăn của bạn</label>
+                    <textarea id="dilemma-input" rows="3" class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition text-sm sm:text-base resize-none" placeholder="Hãy viết chi tiết điều bạn đang do dự... (Ví dụ: Có nên bán bớt tài sản hiện tại để dồn tiền đầu tư mạo hiểm?)"></textarea>
+                </div>
+            </div>
+            <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-slate-800/60 pt-4">
+                <span class="text-[11px] text-slate-500 flex items-center gap-1.5 text-center sm:text-left">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.9c.747-.323 1.554-.484 2.38-.484s1.632.16 2.38.484a11.116 11.116 0 001.996.695c.571.144 1.156.216 1.745.216.59 0 1.174-.072 1.746-.216a11.111 11.111 0 001.995-.695c.748-.323 1.555-.484 2.38-.484.825 0 1.632.16 2.38.484.5.216.82.709.82 1.256V15c0 .953-.88 1.63-1.785 1.4a12.133 12.133 0 01-3.155-.9c-.516-.188-1.053-.284-1.593-.284a5.96 5.96 0 00-1.594.284c-.658.24-1.348.544-2.046.78a11.028 11.028 0 01-3.66.425c-.865-.052-1.55-.747-1.55-1.614V6.156c0-.547.32-.1.82-.316V4.9z" clip-rule="evenodd"/></svg>
+                    Dữ liệu được xử lý trực tiếp tại trình duyệt & không lưu trữ.
+                </span>
+                <button id="btn-submit" onclick="submitDilemma()" class="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium text-sm px-6 py-2.5 rounded-xl transition shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2">
+                    <span id="submit-text">Khai hỏa bàn đàm phán</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Waiting / Loading Screen -->
+        <div id="loader" class="hidden max-w-3xl mx-auto text-center py-16 space-y-4">
+            <div class="relative w-16 h-16 mx-auto">
+                <!-- Outer Ring -->
+                <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+                <!-- Spining Glow -->
+                <div class="absolute inset-0 rounded-full border-4 border-t-indigo-500 border-r-purple-500 animate-spin"></div>
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-slate-300 animate-pulse">Các phân thân tư duy đang luận đàm gay gắt...</p>
+                <p class="text-[11px] text-slate-500 mt-1">Đang mô phỏng The Visionary, The Realist và The Critic</p>
+            </div>
+        </div>
+
+        <!-- Negotiation Table Container (Initially Hidden) -->
+        <div id="negotiation-workspace" class="hidden mt-12 space-y-10">
+            
+            <div class="text-center">
+                <span class="px-3 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700 uppercase tracking-widest">
+                    Hội Đồng Nội Tâm
+                </span>
+                <h3 class="text-xl font-bold text-white mt-2">Bàn đàm phán 3 chiều</h3>
+            </div>
+
+            <!-- 3 Persona Cards Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Persona 1: The Visionary (Emerald/Green Glow) -->
+                <div class="bg-slate-900/50 border border-emerald-500/20 hover:border-emerald-500/40 rounded-2xl p-6 shadow-xl flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl group-hover:bg-emerald-500/10 transition-all"></div>
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                <!-- Lightbulb Icon -->
+                                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-md font-bold text-emerald-400">The Visionary</h4>
+                                <span class="text-[10px] text-emerald-500 font-semibold uppercase tracking-wider">Kẻ mộng mơ & Cơ hội</span>
+                            </div>
+                        </div>
+                        <div id="visionary-response" class="text-slate-300 text-sm leading-relaxed space-y-2 whitespace-pre-wrap">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Persona 2: The Realist (Sky Blue Glow) -->
+                <div class="bg-slate-900/50 border border-sky-500/20 hover:border-sky-500/40 rounded-2xl p-6 shadow-xl flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-3xl group-hover:bg-sky-500/10 transition-all"></div>
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+                                <!-- Balance Scale Icon -->
+                                <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-md font-bold text-sky-400">The Realist</h4>
+                                <span class="text-[10px] text-sky-500 font-semibold uppercase tracking-wider">Nhà thực tế & Logic</span>
+                            </div>
+                        </div>
+                        <div id="realist-response" class="text-slate-300 text-sm leading-relaxed space-y-2 whitespace-pre-wrap">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Persona 3: The Critic (Rose/Red Glow) -->
+                <div class="bg-slate-900/50 border border-rose-500/20 hover:border-rose-500/40 rounded-2xl p-6 shadow-xl flex flex-col justify-between transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-3xl group-hover:bg-rose-500/10 transition-all"></div>
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
+                                <!-- Shield Exclamation Icon -->
+                                <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-md font-bold text-rose-400">The Critic</h4>
+                                <span class="text-[10px] text-rose-500 font-semibold uppercase tracking-wider">Kẻ phản biện & Rủi ro</span>
+                            </div>
+                        </div>
+                        <div id="critic-response" class="text-slate-300 text-sm leading-relaxed space-y-2 whitespace-pre-wrap">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Interactive Dialogue / Rebuttal Area -->
+            <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-6 shadow-lg">
+                <div class="mb-4">
+                    <h4 class="text-md font-bold text-white flex items-center gap-2">
+                        <span>💬</span> Tranh biện phản hồi hội đồng
+                    </h4>
+                    <p class="text-xs text-slate-400 mt-1">Bạn muốn trả lời, chất vấn hay cung cấp thêm góc nhìn mới cho phân thân nào? Hãy nhập ý kiến và chọn người phản hồi tiếp theo.</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-4 items-stretch">
+                    <textarea id="rebuttal-input" rows="2" class="flex-grow bg-slate-900 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 resize-none" placeholder="Ví dụ: Tôi đồng tình với Critic về rủi ro dòng tiền, nhưng Visionary nói đúng về cơ hội vàng..."></textarea>
+                    
+                    <div class="flex flex-col justify-between gap-3 min-w-[200px]">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Đối tượng chất vấn:</label>
+                            <select id="rebuttal-target" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <option value="all">Tất cả hội đồng (All Personas)</option>
+                                <option value="visionary">The Visionary (Người mộng mơ)</option>
+                                <option value="realist">The Realist (Người thực tế)</option>
+                                <option value="critic">The Critic (Người chỉ trích)</option>
+                            </select>
+                        </div>
+                        <button id="btn-rebut" onclick="submitRebuttal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold py-2.5 px-4 rounded-lg transition flex items-center justify-center gap-1.5">
+                            <span>Nộp luận điểm mới</span>
+                            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Inner Chat Timeline (Appends dynamically inside session) -->
+                <div id="chat-timeline" class="mt-6 space-y-4 max-h-[250px] overflow-y-auto pr-2 hidden">
+                    <!-- Historical debate entries go here -->
+                </div>
+            </div>
+
+            <!-- Action Report / Contract Generation Card -->
+            <div class="bg-gradient-to-br from-indigo-950/20 via-slate-900 to-purple-950/20 border border-indigo-500/20 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl"></div>
+                
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-slate-800/80">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl">📜</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-white">Lập Biên Bản Đàm Phán & Kế Hoạch Hành Động</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1">Dung hòa các luồng tư duy thành bản kế hoạch hành động thực tế chi tiết.</p>
+                    </div>
+                    <button id="btn-summary" onclick="generateSummaryReport()" class="w-full md:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-5 py-3 rounded-xl transition shadow-lg shadow-amber-500/10 flex items-center justify-center gap-2">
+                        <span>Ký Biên Bản & Tổng Kết Hành Động</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </button>
+                </div>
+
+                <!-- Report Loader -->
+                <div id="summary-loader" class="hidden py-8 text-center space-y-2">
+                    <div class="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-amber-500 rounded-full"></div>
+                    <p class="text-xs text-slate-400">Trọng tài tư duy đang soạn thảo biên bản cân bằng nhất...</p>
+                </div>
+
+                <!-- Summary Document Display -->
+                <div id="summary-document" class="hidden mt-6 bg-slate-950/80 border border-slate-800 rounded-xl p-5 sm:p-6 space-y-6">
+                    <div class="flex justify-between items-center border-b border-slate-800/80 pb-4">
+                        <span class="text-xs text-slate-500">Mã Số: NEG-PRO-2026</span>
+                        <button onclick="printSummary()" class="text-xs text-slate-400 hover:text-slate-200 bg-slate-900 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-md flex items-center gap-1.5 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                            In / Lưu PDF
+                        </button>
+                    </div>
+                    
+                    <div id="summary-content" class="text-slate-300 text-sm leading-relaxed space-y-4 whitespace-pre-wrap">
+                        <!-- Summary document loaded here -->
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900/60 bg-slate-950/40 py-6 text-center">
+        <div class="max-w-7xl mx-auto px-4 text-xs text-slate-500 space-y-2">
+            <p>© 2026 Self-Negotiation Bot - Trợ lý hỗ trợ thương lượng nội tâm.</p>
+            <p>Xây dựng trên nền tảng xử lý dữ liệu phi tập trung không giữ nhật ký phiên trò chuyện.</p>
+        </div>
+    </footer>
+
+    <!-- Universal Privacy Policy Modal -->
+    <div id="privacy-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center border-b border-slate-800 pb-4 mb-4">
+                    <h3 id="privacy-title" class="text-md font-bold text-white flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Chính Sách Bảo Mật & Điều Khoản
+                    </h3>
+                    <button onclick="closeModal('privacy-modal')" class="text-slate-400 hover:text-white transition text-lg font-bold">&times;</button>
+                </div>
+                
+                <!-- Language Toggle -->
+                <div class="flex items-center gap-2 mb-6 bg-slate-950 p-1 rounded-lg w-fit border border-slate-800">
+                    <button id="btn-lang-vi" onclick="togglePrivacyLang('vi')" class="px-4 py-1.5 text-xs font-bold rounded-md bg-indigo-600 text-white shadow-sm transition">Tiếng Việt</button>
+                    <button id="btn-lang-en" onclick="togglePrivacyLang('en')" class="px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white transition">English</button>
+                </div>
+                
+                <div class="overflow-y-auto pr-1">
+                    <!-- Vietnamese Content (Default) -->
+                    <div id="privacy-content-vi" class="space-y-4 text-xs text-slate-300 leading-relaxed">
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-slate-100 uppercase tracking-wider text-[11px] border-l-2 border-indigo-500 pl-2">Cam kết Quyền riêng tư</h4>
+                            <p><strong>Không lưu trữ:</strong> Ứng dụng hoạt động hoàn toàn ở phía máy khách. Toàn bộ thông tin, khúc mắc, xung đột nội tâm mà bạn điền vào sẽ không lưu trữ trên bất kỳ máy chủ dữ liệu nào bên thứ ba hoặc máy chủ của chúng tôi.</p>
+                            <p><strong>Truyền nhận API trực tiếp:</strong> Dữ liệu từ trình duyệt của bạn sẽ được đóng gói truyền trực tiếp đến hạ tầng xử lý ngôn ngữ thế hệ mới của Google Gemini để sinh phản hồi tức thời thông qua giao thức mã hóa HTTPS.</p>
+                            <p><strong>Xóa sạch dữ liệu khi tắt tab:</strong> Mọi cuộc hội thoại và dữ liệu phiên (Session Data) sẽ hoàn toàn bị giải phóng và xóa sạch ngay khi bạn tải lại (F5) trình duyệt hoặc đóng tab ứng dụng.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- English Content (Hidden by Default) -->
+                    <div id="privacy-content-en" class="hidden space-y-4 text-xs text-slate-300 leading-relaxed">
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-slate-100 uppercase tracking-wider text-[11px] border-l-2 border-indigo-500 pl-2">Privacy & Terms</h4>
+                            <p><strong>Zero-Retention Policy:</strong> This software operates client-side. Your inputs, dilemmas, and conversational context are never logged, persisted, or stored in any database.</p>
+                            <p><strong>Direct API Endpoints:</strong> Your sensitive dialogs are transmitted directly and safely to Google Gemini processing clusters via secure HTTPS, returning values instantly without middleman caching.</p>
+                            <p><strong>Immediate Deletion:</strong> Simply reloading the page or closing the active browser tab triggers absolute deletion of the session, purging every chat detail.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-800 flex justify-end">
+                <button id="privacy-close-btn" onclick="closeModal('privacy-modal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-5 py-2.5 rounded-lg transition">
+                    Tôi Đã Hiểu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Area containing Application Core Logic -->
+    <script>
+        // API Configuration (Provided dynamically by environment at runtime, empty string as default)
+        const apiKey = "AIzaSyDfTtSLw1LqyetKE_FWHhnjNfP7ir1HmmQ";
+        const fallbackModel = "gemini-2.5-flash-preview-09-2025";
+        
+        let initialDilemma = "";
+        let visionaryState = "";
+        let realistState = "";
+        let criticState = "";
+        let chatLogs = []; // Historical logs for multi-turn negotiation
+
+        // Backoff retry mechanism as mandated
+        async function runGeminiCallWithRetry(payload, maxRetries = 5) {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${fallbackModel}:generateContent?key=${apiKey}`;
+            let delay = 1000;
+            
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(endpoint, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (response.ok) {
+                        return await response.json();
+                    }
+                    
+                    if (response.status === 429 || response.status >= 500) {
+                        // Triggers exponential backoff delay
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    } else {
+                        const errorDetails = await response.text();
+                        throw new Error(`API Request Error [Status ${response.status}]: ${errorDetails}`);
+                    }
+                } catch (err) {
+                    if (attempt === maxRetries - 1) {
+                        throw err; // Re-throw if exhausted
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        // Helper to populate suggest options
+        function useSuggestion(text) {
+            document.getElementById('dilemma-input').value = text;
+            // Scroll to input box smoothly
+            document.getElementById('dilemma-input').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Modal triggers
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Toggle Privacy Language
+        function togglePrivacyLang(lang) {
+            const btnVi = document.getElementById('btn-lang-vi');
+            const btnEn = document.getElementById('btn-lang-en');
+            const contentVi = document.getElementById('privacy-content-vi');
+            const contentEn = document.getElementById('privacy-content-en');
+            const title = document.getElementById('privacy-title');
+            const closeBtn = document.getElementById('privacy-close-btn');
+
+            const activeBtnClass = "px-4 py-1.5 text-xs font-bold rounded-md bg-indigo-600 text-white shadow-sm transition";
+            const inactiveBtnClass = "px-4 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-white transition";
+            const iconSvg = '<svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>';
+
+            if (lang === 'vi') {
+                btnVi.className = activeBtnClass;
+                btnEn.className = inactiveBtnClass;
+                contentVi.classList.remove('hidden');
+                contentEn.classList.add('hidden');
+                title.innerHTML = iconSvg + ' Chính Sách Bảo Mật & Điều Khoản';
+                closeBtn.textContent = 'Tôi Đã Hiểu';
+            } else {
+                btnEn.className = activeBtnClass;
+                btnVi.className = inactiveBtnClass;
+                contentEn.classList.remove('hidden');
+                contentVi.classList.add('hidden');
+                title.innerHTML = iconSvg + ' Privacy Policy & Terms';
+                closeBtn.textContent = 'I Understand';
+            }
+        }
+
+        // Initial submission
+        async function submitDilemma() {
+            const inputVal = document.getElementById('dilemma-input').value.trim();
+            if (!inputVal) {
+                showVisualMessage("Hãy viết ra băn khoăn của bạn trước khi bắt đầu cuộc thương thảo.", "warning");
+                return;
+            }
+
+            initialDilemma = inputVal;
+            
+            // Switch UI states
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('negotiation-workspace').classList.add('hidden');
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('btn-submit').disabled = true;
+
+            // System instructions for extreme personality split
+            const systemPrompt = `Bạn là một mô hình phân tích tâm lý tích hợp trí tuệ quyết định. Nhiệm vụ của bạn là nhận vào một trăn trở, quyết định khó khăn của người dùng và phân tích nó đồng thời qua ba "màng lọc tư duy" đối nghịch gay gắt sau:
+            1. "visionary": Đóng vai Kẻ mộng mơ đầy tham vọng. Luôn hướng tới cơ hội, phát triển đột phá, giá trị dài hạn, thúc giục người dùng vượt ra ngoài sự sợ hãi để bứt phá.
+            2. "realist": Đóng vai Nhà thực tế lạnh lùng. Chỉ quan tâm đến tài nguyên hiện tại, nguồn lực sẵn có, tính khả thi tức thời, logic chặt chẽ, các bước chuẩn bị thực dụng.
+            3. "critic": Đóng vai Kẻ chỉ trích khắc nghiệt. Luôn vạch ra các điểm mù, điểm rủi ro lớn nhất, lỗ hổng tài chính/thời gian, các lý do thực tế có thể khiến người dùng thất bại ê chề.
+
+            Bạn PHẢI trả lời dưới định dạng JSON thuần túy cấu trúc sau để hệ thống bóc tách hiển thị song song:
+            {
+                "visionary": "Phần phản hồi chuyên sâu của The Visionary viết bằng tiếng Việt",
+                "realist": "Phần phản hồi chuyên sâu của The Realist viết bằng tiếng Việt",
+                "critic": "Phần phản hồi chuyên sâu của The Critic viết bằng tiếng Việt"
+            }`;
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: `Hãy phân tích quyết định sau: "${initialDilemma}"` }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            visionary: { type: "STRING" },
+                            realist: { type: "STRING" },
+                            critic: { type: "STRING" }
+                        },
+                        required: ["visionary", "realist", "critic"]
+                    }
+                }
+            };
+
+            try {
+                const result = await runGeminiCallWithRetry(payload);
+                const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!responseText) {
+                    throw new Error("Không thể trích xuất phản hồi từ AI.");
+                }
+
+                const parsedData = JSON.parse(responseText);
+                
+                visionaryState = parsedData.visionary;
+                realistState = parsedData.realist;
+                criticState = parsedData.critic;
+
+                // Push answers to visual components
+                document.getElementById('visionary-response').textContent = visionaryState;
+                document.getElementById('realist-response').textContent = realistState;
+                document.getElementById('critic-response').textContent = criticState;
+
+                // Save to chat log tracking
+                chatLogs = [
+                    { role: "visionary", message: visionaryState },
+                    { role: "realist", message: realistState },
+                    { role: "critic", message: criticState }
+                ];
+
+                // Show Workspace
+                document.getElementById('negotiation-workspace').classList.remove('hidden');
+                document.getElementById('negotiation-workspace').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                console.error("Negotiation Bot Core Failure: ", err);
+                showVisualMessage("Đã xảy ra sự cố kết nối đàm phán hoặc định dạng API lỗi. Xin vui lòng kiểm tra kết nối mạng và thử lại.", "error");
+            } finally {
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('btn-submit').disabled = false;
+            }
+        }
+
+        // Submitting follow up rebuttal / continuous debate
+        async function submitRebuttal() {
+            const inputElement = document.getElementById('rebuttal-input');
+            const rebuttalVal = inputElement.value.trim();
+            const targetPersona = document.getElementById('rebuttal-target').value;
+
+            if (!rebuttalVal) {
+                showVisualMessage("Vui lòng điền nội dung phản hồi phản biện trước khi nộp luận điểm.", "warning");
+                return;
+            }
+
+            const btnRebut = document.getElementById('btn-rebut');
+            btnRebut.disabled = true;
+            btnRebut.textContent = "Hội đồng đang phản biện...";
+
+            const userEntry = {
+                role: "user",
+                message: `[Gửi tới ${targetPersona}]: ${rebuttalVal}`
+            };
+            
+            // Build Context for Next Multi-turn payload
+            const contextHistory = chatLogs.map(log => `${log.role.toUpperCase()}: ${log.message}`).join("\n\n");
+            
+            const systemPrompt = `Bạn là đại diện của ba luồng suy nghĩ nội tâm của người dùng (Visionary, Realist, Critic).
+            Người dùng vừa phản hồi tiếp: "${rebuttalVal}" nhắm mục tiêu phản biện đến: "${targetPersona}".
+            Nhiệm vụ của bạn là đưa ra phản hồi tiếp tục từ ba luồng suy nghĩ này, phản ứng lại ý kiến mới của người dùng dựa trên lập trường độc lập của từng vai.
+            
+            Hãy trả về cấu trúc JSON thuần túy:
+            {
+                "visionary": "Cập nhật quan điểm phản hồi tiếp theo của Visionary dựa trên phản biện mới",
+                "realist": "Cập nhật quan điểm phản hồi tiếp theo của Realist dựa trên phản biện mới",
+                "critic": "Cập nhật quan điểm phản hồi tiếp theo của Critic dựa trên phản biện mới"
+            }`;
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: `Bối cảnh đàm phán trước đó:\n${contextHistory}\n\nÝ kiến phản biện mới của người dùng:\n${rebuttalVal}\n\nHãy phản hồi.` }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            visionary: { type: "STRING" },
+                            realist: { type: "STRING" },
+                            critic: { type: "STRING" }
+                        },
+                        required: ["visionary", "realist", "critic"]
+                    }
+                }
+            };
+
+            try {
+                const result = await runGeminiCallWithRetry(payload);
+                const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!responseText) throw new Error("Không lấy được dữ liệu phản biện.");
+                
+                const parsedData = JSON.parse(responseText);
+
+                // Add to visible Timeline
+                const timeline = document.getElementById('chat-timeline');
+                timeline.classList.remove('hidden');
+
+                // Render user response card inside timeline
+                const userCard = document.createElement('div');
+                userCard.className = "bg-slate-900 border border-slate-800 p-3.5 rounded-xl space-y-1";
+                userCard.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] font-bold text-slate-400">
+                        <span>BẠN (GỬI ${targetPersona.toUpperCase()})</span>
+                        <span class="text-slate-500">Bừa phản biện</span>
+                    </div>
+                    <p class="text-xs text-slate-300">${rebuttalVal}</p>
+                `;
+                timeline.appendChild(userCard);
+
+                // Highlight/update cards on main columns
+                visionaryState = parsedData.visionary;
+                realistState = parsedData.realist;
+                criticState = parsedData.critic;
+
+                document.getElementById('visionary-response').textContent = visionaryState;
+                document.getElementById('realist-response').textContent = realistState;
+                document.getElementById('critic-response').textContent = criticState;
+
+                // Push new responses to log
+                chatLogs.push({ role: "user", message: rebuttalVal });
+                chatLogs.push({ role: "visionary", message: visionaryState });
+                chatLogs.push({ role: "realist", message: realistState });
+                chatLogs.push({ role: "critic", message: criticState });
+
+                // Scroll timeline to bottom
+                timeline.scrollTop = timeline.scrollHeight;
+                inputElement.value = "";
+
+                showVisualMessage("Hội đồng đã xem xét luận điểm và cập nhật phản biện mới!", "success");
+
+            } catch (err) {
+                console.error("Rebuttal Phase Failure: ", err);
+                showVisualMessage("Không thể gửi phản biện. Vui lòng kiểm tra lại.", "error");
+            } finally {
+                btnRebut.disabled = false;
+                btnRebut.innerHTML = `
+                    <span>Nộp luận điểm mới</span>
+                    <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                `;
+            }
+        }
+
+        // Assemble Final Summary Action Report (Arbitrator role)
+        async function generateSummaryReport() {
+            document.getElementById('summary-loader').classList.remove('hidden');
+            document.getElementById('summary-document').classList.add('hidden');
+            const btnSum = document.getElementById('btn-summary');
+            btnSum.disabled = true;
+
+            const logsText = chatLogs.map(log => `${log.role.toUpperCase()}: ${log.message}`).join("\n\n");
+
+            const systemPrompt = `Bạn là Trọng Tài Tư Duy tối cao, đại diện cho bản ngã thông thái nhất của người dùng.
+            Nhiệm vụ của bạn là lấy toàn bộ cuộc đối thoại đàm phán nội tâm, các rủi ro đã thảo luận, cùng nguyện vọng ban đầu để tổng hợp thành một "Biên bản đàm phán" (Summary Report) dung hòa tối ưu nhất.
+            
+            Biên bản bắt buộc phải được trình bày trang trọng, chuyên nghiệp theo cấu trúc tiếng Việt cụ thể:
+            1. PHÂN TÍCH TOÀN CẢNH: Đánh giá mâu thuẫn cốt lõi giữa khao khát (Visionary) và nỗi sợ (Critic).
+            2. ĐIỂM DUNG HÒA AN TOÀN (Giao điểm thực tế): Đâu là phương án giải quyết tối ưu kết hợp động lực của Visionary, tính toán của Realist, và phòng ngừa của Critic?
+            3. KẾ HOẠCH HÀNH ĐỘNG CỤ THỂ (Action Plan): Vạch ra chính xác 3 đến 4 hành động thực tế tiếp theo (có tiêu đề hành động, thời hạn ước tính, và tiêu chí hoàn thành) để kiểm thử/thử nghiệm quyết định này mà không chịu rủi ro quá lớn.
+            4. THÔNG ĐIỆP ĐỘNG VIÊN NỘI TÂM: Lời khuyên cuối đầy thấu hiểu, động lực giúp họ vững tâm hành động.`;
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: `Vấn đề ban đầu: "${initialDilemma}"\n\nNhật ký đối thoại đàm phán nội tâm:\n${logsText}\n\nHãy soạn thảo Biên bản tổng hợp đàm phán.` }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            try {
+                const result = await runGeminiCallWithRetry(payload);
+                const summaryText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!summaryText) throw new Error("Không thể sinh biên bản tổng kết.");
+
+                document.getElementById('summary-content').textContent = summaryText;
+                document.getElementById('summary-document').classList.remove('hidden');
+                document.getElementById('summary-document').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                console.error("Summary Generation Error: ", err);
+                showVisualMessage("Không thể kết xuất biên bản tự động. Hãy thử lại.", "error");
+            } finally {
+                document.getElementById('summary-loader').classList.add('hidden');
+                btnSum.disabled = false;
+            }
+        }
+
+        // Custom Toast/Notification instead of window alerts
+        function showVisualMessage(message, type = "info") {
+            const toastId = "app-toast";
+            let toast = document.getElementById(toastId);
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.id = toastId;
+                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300 transform translate-y-10 opacity-0 max-w-sm";
+                document.body.appendChild(toast);
+            }
+
+            // Style configuration based on alert type
+            if (type === "warning") {
+                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border border-amber-500/30 bg-amber-950/80 text-amber-200 shadow-2xl transition-all duration-300 max-w-sm";
+            } else if (type === "error") {
+                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border border-rose-500/30 bg-rose-950/80 text-rose-200 shadow-2xl transition-all duration-300 max-w-sm";
+            } else {
+                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border border-emerald-500/30 bg-emerald-950/80 text-emerald-200 shadow-2xl transition-all duration-300 max-w-sm";
+            }
+
+            toast.textContent = message;
+            toast.style.transform = "translateY(0px)";
+            toast.style.opacity = "1";
+
+            setTimeout(() => {
+                toast.style.transform = "translateY(10px)";
+                toast.style.opacity = "0";
+            }, 4500);
+        }
+
+        // Print function to physically save or print out the action report
+        function printSummary() {
+            const printContent = document.getElementById('summary-content').textContent;
+            const originalContent = document.body.innerHTML;
+
+            // Simplified print template
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Biên bản đàm phán nội tâm - Self-Negotiation Bot</title>');
+            printWindow.document.write('<style>body{font-family: sans-serif; padding: 40px; color: #1e293b; line-height: 1.6;} h1{color: #3b82f6;} pre{white-space: pre-wrap; font-family: inherit;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h1>BIÊN BẢN ĐÀM PHÁN TƯ DUY NỘI TÂM</h1>');
+            printWindow.document.write(`<p><strong>Vấn đề đưa ra đàm phán:</strong> "${initialDilemma}"</p>`);
+            printWindow.document.write('<hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">');
+            printWindow.document.write('<pre>' + printContent + '</pre>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+    </script>
+</body>
+</html>
