@@ -51,7 +51,7 @@
             
             <div class="flex items-center space-x-3">
                 <button onclick="openModal('privacy-modal')" class="text-xs text-slate-400 hover:text-slate-200 bg-slate-800/50 hover:bg-slate-800 px-3.5 py-2 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                     <span>Quyền riêng tư (Privacy)</span>
                 </button>
             </div>
@@ -339,9 +339,9 @@
 
     <!-- Script Area containing Application Core Logic -->
     <script>
-        // API Configuration (Provided dynamically by environment at runtime, empty string as default)
+        // API Configuration (Corrected endpoint path to use the stable Gemini 2.5 Flash model)
         const apiKey = "AIzaSyDfTtSLw1LqyetKE_FWHhnjNfP7ir1HmmQ";
-        const fallbackModel = "gemini-2.5-flash-preview-09-2025";
+        const fallbackModel = "gemini-2.5-flash";
         
         let initialDilemma = "";
         let visionaryState = "";
@@ -593,7 +593,7 @@
                 userCard.innerHTML = `
                     <div class="flex justify-between items-center text-[10px] font-bold text-slate-400">
                         <span>BẠN (GỬI ${targetPersona.toUpperCase()})</span>
-                        <span class="text-slate-500">Bừa phản biện</span>
+                        <span class="text-slate-500">Vừa phản biện</span>
                     </div>
                     <p class="text-xs text-slate-300">${rebuttalVal}</p>
                 `;
@@ -680,52 +680,4 @@
 
         // Custom Toast/Notification instead of window alerts
         function showVisualMessage(message, type = "info") {
-            const toastId = "app-toast";
-            let toast = document.getElementById(toastId);
-            if (!toast) {
-                toast = document.createElement("div");
-                toast.id = toastId;
-                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300 transform translate-y-10 opacity-0 max-w-sm";
-                document.body.appendChild(toast);
-            }
-
-            // Style configuration based on alert type
-            if (type === "warning") {
-                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border border-amber-500/30 bg-amber-950/80 text-amber-200 shadow-2xl transition-all duration-300 max-w-sm";
-            } else if (type === "error") {
-                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border border-rose-500/30 bg-rose-950/80 text-rose-200 shadow-2xl transition-all duration-300 max-w-sm";
-            } else {
-                toast.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-xl border border-emerald-500/30 bg-emerald-950/80 text-emerald-200 shadow-2xl transition-all duration-300 max-w-sm";
-            }
-
-            toast.textContent = message;
-            toast.style.transform = "translateY(0px)";
-            toast.style.opacity = "1";
-
-            setTimeout(() => {
-                toast.style.transform = "translateY(10px)";
-                toast.style.opacity = "0";
-            }, 4500);
-        }
-
-        // Print function to physically save or print out the action report
-        function printSummary() {
-            const printContent = document.getElementById('summary-content').textContent;
-            const originalContent = document.body.innerHTML;
-
-            // Simplified print template
-            const printWindow = window.open('', '', 'height=600,width=800');
-            printWindow.document.write('<html><head><title>Biên bản đàm phán nội tâm - Self-Negotiation Bot</title>');
-            printWindow.document.write('<style>body{font-family: sans-serif; padding: 40px; color: #1e293b; line-height: 1.6;} h1{color: #3b82f6;} pre{white-space: pre-wrap; font-family: inherit;}</style>');
-            printWindow.document.write('</head><body>');
-            printWindow.document.write('<h1>BIÊN BẢN ĐÀM PHÁN TƯ DUY NỘI TÂM</h1>');
-            printWindow.document.write(`<p><strong>Vấn đề đưa ra đàm phán:</strong> "${initialDilemma}"</p>`);
-            printWindow.document.write('<hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">');
-            printWindow.document.write('<pre>' + printContent + '</pre>');
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.print();
-        }
-    </script>
-</body>
-</html>
+            const toastId = "
